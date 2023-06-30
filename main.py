@@ -80,10 +80,10 @@ def capture_color_sequence(**kwargs):
         # capturing the current frame
         valid, frame = vid.read()
         
-        if 'video_file' not in kwargs and wait % SKIP_FR == 0:
+        if 'video_file' not in kwargs and wait % SKIP_FR != 0:
             wait+=1
             continue
-
+        wait+=1
         if not valid:
             if right-left==4 and right!=0:
                 tup=tuple(color_seq[left:right])
