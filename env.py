@@ -1,3 +1,5 @@
+MIN_COLOR_DURATION = 250
+
 color_to_dec = {
     'black': (0, 0, 0),
     'white': (255, 255, 255),
