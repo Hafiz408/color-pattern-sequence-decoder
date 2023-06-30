@@ -55,11 +55,11 @@ def decode_sequence(seq):
    return valid_pattern.get(tuple(seq), 'Invalid')
 
 def capture_color_sequence(**kwargs):
+    
     left,right=0,0
     q=collections.deque()
 
     color_seq = []
-    queue = []
 
     if 'video_file' in kwargs:
         # taking input from video file
@@ -100,31 +100,32 @@ def capture_color_sequence(**kwargs):
 
         # print((r_estimate,g_estimate,b_estimate), rgb, color)
 
-        color_seq.append(color)
+        #color_seq.append(color)
 
         # avoid invalid colors
         if color != '404':
-            queue.append(color)
 
-        # # decode sequence if queue has 4 color 
-        # if len(queue) == 4:
-        #    print(decode_sequence(queue))
-        #    queue.clear()
+            color_seq.append(color)
 
-        # Code to check patterns
-        if right-left==4 and right!=0:
-            tup=tuple(color_seq[left:right])
-            if tup in keys:
-                if len(q)>1 and len(q)<=3:
-                    partialMatch(tuple(q))
-                q.clear()
-                print("Valid Pattern ",valid_pattern[tup])
-                left=right
-            else:
-                print("Invalid Pattern")
-                q.append(color_seq[left])
-                left=left+1
-        right=right+1
+            # # decode sequence if queue has 4 color 
+            # if len(queue) == 4:
+            #    print(decode_sequence(queue))
+            #    queue.clear()
+
+            # Code to check patterns
+            if right-left==4 and right!=0:
+                tup=tuple(color_seq[left:right])
+                if tup in keys:
+                    if len(q)>1 and len(q)<=3:
+                        partialMatch(tuple(q))
+                    q.clear()
+                    print("Valid Pattern ",valid_pattern[tup])
+                    left=right
+                else:
+                    print("Invalid Pattern")
+                    q.append(color_seq[left])
+                    left=left+1
+            right=right+1
 
         if 'video_file' in kwargs:
             # forward by milliseconds
@@ -141,6 +142,6 @@ def capture_color_sequence(**kwargs):
     cv2.destroyAllWindows()
     return color_seq
 
-print(capture_color_sequence(video_file='shortVideo.mp4'))
+print(capture_color_sequence())
 # seq = capture_color_sequence()
 # print(len(seq))
