@@ -18,6 +18,7 @@ def closest_rgb(r,g,b):
 
    return (r,g,b)
 
+# Function to find dominant color from frame from webcam
 def find_dominant_color(frame):
     # Convert the frame from BGR to RGB
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -37,6 +38,7 @@ def find_dominant_color(frame):
 
     return r, g, b
 
+# Find partial patterns
 def partialMatch(subset):
     for i in range(len(keys)):
         j=0
@@ -45,7 +47,7 @@ def partialMatch(subset):
                 break
             j+=1
         if j==len(subset):
-            print("Partial pattern ",i+1)
+            print("Partial Pattern ",i+1)
             return
 
 # find the valid pattern for the given 4 color sequence
@@ -78,7 +80,7 @@ def capture_color_sequence(**kwargs):
         # displaying the current frame
         cv2.imshow("frame", frame)
 
-        if not 'video_file' in kwargs:
+        if 'video_file' not in kwargs:
             # find dominant color from frame
             r_estimate, g_estimate, b_estimate = find_dominant_color(frame)
         else:
@@ -116,10 +118,10 @@ def capture_color_sequence(**kwargs):
                 if len(q)>1 and len(q)<=3:
                     partialMatch(tuple(q))
                 q.clear()
-                print("Pattern ",valid_pattern[tup])
+                print("Valid Pattern ",valid_pattern[tup])
                 left=right
             else:
-                print("Invalid")
+                print("Invalid Pattern")
                 q.append(color_seq[left])
                 left=left+1
         right=right+1
