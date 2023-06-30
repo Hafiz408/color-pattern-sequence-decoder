@@ -11,6 +11,11 @@ def closest_value(input_value):
   i = (np.abs(arr - input_value)).argmin()
   return arr[i]
 
+def skip_frames(fps,duration):
+    return round(duration/(1000/fps))
+
+SKIP_FR = skip_frames(FPS,MIN_COLOR_DURATION)
+
 def closest_rgb(r,g,b):
    r = closest_value(r)
    g = closest_value(g)
@@ -69,12 +74,30 @@ def capture_color_sequence(**kwargs):
         vid = cv2.VideoCapture(0)
 
     milliseconds = 0
+    wait = 0
     while vid.isOpened():
         
         # capturing the current frame
         valid, frame = vid.read()
         
+        if 'video_file' not in kwargs and wait % SKIP_FR == 0:
+            wait+=1
+            continue
+
         if not valid:
+            if right-left==4 and right!=0:
+                tup=tuple(color_seq[left:right])
+                if tup in keys:
+                    if len(q)>1 and len(q)<=3:
+                        partialMatch(tuple(q))
+                    q.clear()
+                    print("Valid Pattern ",valid_pattern[tup])
+                    left=right
+                else:
+                    print("Invalid Pattern")
+                    q.append(color_seq[left])
+                    left=left+1
+            right=right+1
             break
 
         # displaying the current frame
@@ -103,17 +126,7 @@ def capture_color_sequence(**kwargs):
         #color_seq.append(color)
 
         # avoid invalid colors
-        if color != '404':
-
-            color_seq.append(color)
-
-            # # decode sequence if queue has 4 color 
-            # if len(queue) == 4:
-            #    print(decode_sequence(queue))
-            #    queue.clear()
-
-            # Code to check patterns
-            if right-left==4 and right!=0:
+        if right-left==4 and right!=0:
                 tup=tuple(color_seq[left:right])
                 if tup in keys:
                     if len(q)>1 and len(q)<=3:
@@ -125,14 +138,25 @@ def capture_color_sequence(**kwargs):
                     print("Invalid Pattern")
                     q.append(color_seq[left])
                     left=left+1
-            right=right+1
+        right=right+1
+        print(left,right,color)
+        if color != '404':
+
+            color_seq.append(color)
+
+            # # decode sequence if queue has 4 color 
+            # if len(queue) == 4:
+            #    print(decode_sequence(queue))
+            #    queue.clear()
+
+            # Code to check patterns
+            
+            
 
         if 'video_file' in kwargs:
             # forward by milliseconds
             milliseconds += MIN_COLOR_DURATION
             vid.set(cv2.CAP_PROP_POS_MSEC, milliseconds)
-        else:
-            time.sleep(MIN_COLOR_DURATION*10**-3)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
@@ -142,6 +166,6 @@ def capture_color_sequence(**kwargs):
     cv2.destroyAllWindows()
     return color_seq
 
-print(capture_color_sequence())
+print(capture_color_sequence(video_file='shortVideo.mp4'))
 # seq = capture_color_sequence()
 # print(len(seq))
