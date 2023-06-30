@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 from PIL import Image
 from env import *
+import collections
 
 def closest_value(input_value):
   arr = np.array([0, 128, 192, 255])
@@ -16,13 +17,27 @@ def closest_rgb(r,g,b):
 
    return (r,g,b)
 
+def partialMatch(subset):
+    for i in range(len(keys)):
+        j=0
+        while(j<len(subset)):
+            if subset[j]!=keys[i][j]:
+                break
+            j+=1
+        if j==len(subset):
+            print("Partial pattern ",i+1)
+            return
+
 def capture_color_sequence():
+    left,right=0,0
+    q=collections.deque()
+
     color_seq = []
     queue = []
 
     # taking the input from webcam
     # vid = cv2.VideoCapture(0)
-    vid = cv2.VideoCapture('shortVideo.mp4')
+    vid = cv2.VideoCapture('SeqOutput_TestVideo_3.avi')
 
     milliseconds = 0
     while vid.isOpened():
@@ -54,10 +69,21 @@ def capture_color_sequence():
 
         color_seq.append(color)
         queue.append(color)
-
-        if len(queue) == 4:
-           print(decode_sequence(queue))
-           queue.clear()
+        
+        #Code to check patterns
+        if right-left==4 and right!=0:
+            tup=tuple(color_seq[left:right])
+            if tup in keys:
+                if len(q)>1 and len(q)<=3:
+                    partialMatch(tuple(q))
+                q.clear()
+                print("Pattern ",valid_pattern[tup])
+                left=right
+            else:
+                print("Invalid")
+                q.append(color_seq[left])
+                left=left+1
+        right=right+1
 
         # forward by milliseconds
         milliseconds += MIN_COLOR_DURATION

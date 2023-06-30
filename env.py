@@ -79,3 +79,5 @@ valid_pattern = {
     ('navy', 'olive', 'cyan', 'white'): 16,
     ('orange', 'green', 'magenta', 'red'): 17
 }
+
+keys=list(valid_pattern.keys())
