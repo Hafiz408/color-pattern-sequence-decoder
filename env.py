@@ -65,7 +65,7 @@ color_categorical_encoding = {
 
 valid_pattern = {
     ('black', 'purple', 'silver', 'lime'): 1,
-    ('white', 'teal', 'gray', 'blue'): 2,
+    ('white', 'teal', 'grey', 'blue'): 2,
     ('red', 'navy', 'maroon', 'cyan'): 3,
     ('lime', 'orange', 'olive', 'cyan'): 4,
     ('blue', 'black', 'green', 'magenta'): 5,
