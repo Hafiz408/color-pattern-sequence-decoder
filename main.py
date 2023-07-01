@@ -4,11 +4,16 @@ import numpy as np
 import time
 from env import *
 import collections
+import pickle
+import sklearn
 
 def skip_frames(fps,duration):
     return round(duration/(1000/fps))
 
 SKIP_FR = skip_frames(FPS,MIN_COLOR_DURATION)
+
+# Load the saved model
+LOADED_MODEL = pickle.load(open(MODEL_FILENAME, 'rb'))
 
 # crops and returns the center part of frame
 def crop_frame_center(img,width_scale=0.25,height_scale=0.25):
@@ -81,6 +86,12 @@ def partialMatch(subset):
 def decode_sequence(seq):
    return valid_pattern.get(tuple(seq), 'Invalid')
 
+# predict color from webcam rgb
+def predict_rgb(r,g,b):
+    new_data = [[r, g, b]] 
+    predicted_class = LOADED_MODEL.predict(new_data)
+    return predicted_class[0]
+
 def capture_color_sequence(**kwargs):
     
     right = 0
@@ -152,8 +163,13 @@ def capture_color_sequence(**kwargs):
         # find dominant color from frame
         r_estimate, g_estimate, b_estimate = find_dominant_color(frame)
 
-        # finding closest rgb from estimate
-        rgb = closest_rgb(r_estimate, g_estimate, b_estimate)
+        if 'video_file' in kwargs:
+            # finding closest rgb from estimate
+            rgb = closest_rgb(r_estimate, g_estimate, b_estimate)
+        else:
+            # predict the rgb value for webcam input using trained model
+            rgb = predict_rgb(r_estimate, g_estimate, b_estimate)
+
         color = dec_to_color.get(rgb, '404')
 
         # print((r_estimate,g_estimate,b_estimate), rgb, color)
@@ -174,8 +190,8 @@ def capture_color_sequence(**kwargs):
     cv2.destroyAllWindows()
     return color_seq
 
-# print('Color Sequence : ', capture_color_sequence(video_file='SeqOutput_TestVideo_3.avi'))
+print('Color Sequence : ', capture_color_sequence(video_file='SeqOutput_TestVideo_3.avi'))
 
-seq = capture_color_sequence()
-print(len(seq))
-print(seq)
+# seq = capture_color_sequence()
+# print(len(seq))
+# print(seq)

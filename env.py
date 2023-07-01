@@ -3,6 +3,8 @@ FPS = 30
 VALID_DEC_CODES = [0, 128, 255]
 THRESHOLD = 100
 
+MODEL_FILENAME = 'ML\logistic_regression_model.pkl'
+
 color_to_dec = {
     'black': (0, 0, 0),
     'white': (255, 255, 255),
