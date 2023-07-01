@@ -10,6 +10,15 @@ def skip_frames(fps,duration):
 
 SKIP_FR = skip_frames(FPS,MIN_COLOR_DURATION)
 
+# crops and returns the center part of frame
+def crop_frame_center(img,width_scale=0.25,height_scale=0.25):
+    center = img.shape
+    h,w=center[0]*height_scale,center[1]*width_scale
+    x = center[1]/2 - w/2
+    y = center[0]/2 - h/2
+
+    return img[int(y):int(y+h), int(x):int(x+w)]
+
 # map color pixel values to closest valid pixel values
 def closest_valid_value(input_value):
   dec_codes = np.array(VALID_DEC_CODES)
@@ -125,6 +134,9 @@ def capture_color_sequence(**kwargs):
                 continue
             prev_time = curr_time
 
+        # crop only the center part of frame
+        frame = crop_frame_center(frame)
+
         # displaying the current frame
         cv2.imshow("captured frame", frame)
 
@@ -153,8 +165,8 @@ def capture_color_sequence(**kwargs):
     cv2.destroyAllWindows()
     return color_seq
 
-print('Color Sequence : ', capture_color_sequence(video_file='shortVideo.mp4'))
+# print('Color Sequence : ', capture_color_sequence(video_file='shortVideo.mp4'))
 
-# seq = capture_color_sequence()
-# print(len(seq))
-# print(seq)
+seq = capture_color_sequence()
+print(len(seq))
+print(seq)
