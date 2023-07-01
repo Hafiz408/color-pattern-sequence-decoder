@@ -138,11 +138,13 @@ def capture_color_sequence(**kwargs):
                     print("Invalid Pattern")
                     q.append(color_seq[left])
                     left=left+1
-        right=right+1
-        print(left,right,color)
-        if color != '404':
 
+        #print(left,right,color)
+        if color != '404':
+            if right>2 and (color_seq[right-1]==color  and color_seq[right-2]==color):
+                continue
             color_seq.append(color)
+            right=right+1
 
             # # decode sequence if queue has 4 color 
             # if len(queue) == 4:
