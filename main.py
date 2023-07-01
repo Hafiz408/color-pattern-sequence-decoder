@@ -20,8 +20,8 @@ def crop_frame_center(img,width_scale=0.25,height_scale=0.25):
     return img[int(y):int(y+h), int(x):int(x+w)]
 
 # map color pixel values to closest valid pixel values
-def closest_valid_value(input_value):
-  dec_codes = np.array(VALID_DEC_CODES)
+def closest_valid_value(input_value, valid_dec_codes = VALID_DEC_CODES):
+  dec_codes = np.array(valid_dec_codes)
   min = (np.abs(dec_codes - input_value)).min()
   if min <= THRESHOLD:
     i = (np.abs(dec_codes - input_value)).argmin()
@@ -30,11 +30,20 @@ def closest_valid_value(input_value):
     return -1
 
 def closest_rgb(r,g,b):
-   r_valid = closest_valid_value(r)
-   g_valid = closest_valid_value(g)
-   b_valid = closest_valid_value(b)
+    r_valid = closest_valid_value(r, VALID_DEC_CODES + [192])
+    g_valid = closest_valid_value(g, VALID_DEC_CODES + [192])
+    b_valid = closest_valid_value(b, VALID_DEC_CODES + [192])
 
-   return (r_valid, g_valid, b_valid)
+    # check if all values is 192 else compute again without 192 (silver corner case)
+    if len(set([r_valid, g_valid, b_valid])) == 1 and r_valid == 192:
+        return (r_valid, g_valid, b_valid)
+    else:
+        r_valid = closest_valid_value(r)
+        g_valid = closest_valid_value(g)
+        b_valid = closest_valid_value(b)
+    
+        return (r_valid, g_valid, b_valid)
+
 
 # Function to find dominant color from frame from webcam
 def find_dominant_color(frame):

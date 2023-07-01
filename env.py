@@ -1,7 +1,7 @@
 MIN_COLOR_DURATION = 250
 FPS = 30
-VALID_DEC_CODES = [0, 128, 192, 255]
-THRESHOLD = 55
+VALID_DEC_CODES = [0, 128, 255]
+THRESHOLD = 100
 
 color_to_dec = {
     'black': (0, 0, 0),
