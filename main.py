@@ -49,14 +49,14 @@ def find_dominant_color(frame):
 
 # Find partial patterns
 def partialMatch(subset):
-    for i in range(len(keys)):
+    for pattern in valid_pattern:
         j=0
         while(j<len(subset)):
-            if subset[j]!=keys[i][j]:
+            if subset[j]!=pattern[j]:
                 break
             j+=1
         if j==len(subset):
-            print("Partial Pattern ",i+1)
+            print("Partial Pattern ", valid_pattern[pattern])
             return
 
 # find the valid pattern for the given 4 color sequence
@@ -87,27 +87,27 @@ def capture_color_sequence(**kwargs):
 
         # Pattern matchining
         if right==4:
-                tup=tuple(full_buffer)
-                if tup in keys:
-                    if len(partial_buffer)>1 and len(partial_buffer)<=3:
-                        partialMatch(tuple(partial_buffer))
+            tup=tuple(full_buffer)
+            if tup in valid_pattern:
+                if len(partial_buffer)>1 and len(partial_buffer)<=3:
+                    partialMatch(tuple(partial_buffer))
+                partial_buffer.clear()
+                print("Valid Pattern ",valid_pattern[tup])
+                full_buffer.clear()
+                right=0
+            else:
+                if len(partial_buffer)>1 and len(partial_buffer)<=3:
+                    partialMatch(tuple(partial_buffer))
+                    temp=len(partial_buffer)
                     partial_buffer.clear()
-                    print("Valid Pattern ",valid_pattern[tup])
-                    full_buffer.clear()
-                    right=0
                 else:
-                    if len(partial_buffer)>1 and len(partial_buffer)<=3:
-                        partialMatch(tuple(partial_buffer))
-                        temp=len(partial_buffer)
-                        partial_buffer.clear()
-                    else:
-                        print("Invalid Pattern")
-                        temp=1
-                    partial_buffer.append(full_buffer[0])
-                    while temp:
-                        full_buffer.popleft()
-                        right-=1
-                        temp-=1
+                    print("Invalid Pattern")
+                    temp=1
+                partial_buffer.append(full_buffer[0])
+                while temp:
+                    full_buffer.popleft()
+                    right-=1
+                    temp-=1
 
         # Break if no frame captured
         if not valid:
@@ -153,7 +153,7 @@ def capture_color_sequence(**kwargs):
     cv2.destroyAllWindows()
     return color_seq
 
-print(capture_color_sequence(video_file='shortVideo.mp4'))
+print('Color Sequence : ', capture_color_sequence(video_file='shortVideo.mp4'))
 
 # seq = capture_color_sequence()
 # print(len(seq))
