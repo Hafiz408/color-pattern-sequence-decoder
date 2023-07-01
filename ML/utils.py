@@ -2,7 +2,7 @@ import cv2
 import os
 from datetime import datetime
 
-path = "ML/Dataset/magenta/"
+path = "ML/Dataset/white/"
 os.mkdir(path)
 
 i = 0
