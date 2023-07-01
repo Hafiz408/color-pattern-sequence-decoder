@@ -65,8 +65,8 @@ def decode_sequence(seq):
 
 def capture_color_sequence(**kwargs):
     
-    left,right=0,0
-    partial_buffer=collections.deque()
+    right = 0
+    partial_buffer = collections.deque()
     full_buffer = collections.deque()
 
     color_seq = []
@@ -79,66 +79,11 @@ def capture_color_sequence(**kwargs):
         vid = cv2.VideoCapture(0)
 
     milliseconds = 0
-    wait = 0
+    prev_time = 0
     while vid.isOpened():
         
         # capturing the current frame
         valid, frame = vid.read()
-        
-        if 'video_file' not in kwargs and wait % SKIP_FR != 0:
-            wait+=1
-            continue
-        wait+=1
-
-        # For final pattern after break
-        if not valid:
-            if right==4:
-                tup=tuple(full_buffer)
-                if tup in keys:
-                    if len(partial_buffer)>1 and len(partial_buffer)<=3:
-                        partialMatch(tuple(partial_buffer))
-                    partial_buffer.clear()
-                    print("Valid Pattern ",valid_pattern[tup])
-                    full_buffer.clear()
-                else:
-                    if len(partial_buffer)>1 and len(partial_buffer)<=3:
-                        partialMatch(tuple(partial_buffer))
-                        temp=len(partial_buffer)
-                        partial_buffer.clear()
-                    else:
-                        print("Invalid Pattern")
-                        temp=1
-                    partial_buffer.append(full_buffer[0])
-                    while temp:
-                        full_buffer.popleft()
-                        temp-=1
-            right=right+1
-            break
-
-        # displaying the current frame
-        cv2.imshow("frame", frame)
-
-        if 'video_file' not in kwargs:
-            # find dominant color from frame
-            r_estimate, g_estimate, b_estimate = find_dominant_color(frame)
-        else:
-            # setting values for base colors
-            b = frame[:, :, :1]
-            g = frame[:, :, 1:2]
-            r = frame[:, :, 2:]
-
-            # computing the mean
-            b_estimate = int(np.mean(b))
-            g_estimate = int(np.mean(g))
-            r_estimate = int(np.mean(r))
-
-        # finding closest rgb from estimate
-        rgb = closest_rgb(r_estimate, g_estimate, b_estimate)
-        color = dec_to_color.get(rgb, '404')
-
-        # print((r_estimate,g_estimate,b_estimate), rgb, color)
-
-        color_seq.append(color)
 
         # Pattern matchining
         if right==4:
@@ -164,23 +109,41 @@ def capture_color_sequence(**kwargs):
                         right-=1
                         temp-=1
 
-        if color != '404':
-            if right>2 and (full_buffer[right-1]==color  and full_buffer[right-2]==color):
-                continue
-            full_buffer.append(color)
-            right=right+1
-
-            # # decode sequence if queue has 4 color 
-            # if len(queue) == 4:
-            #    print(decode_sequence(queue))
-            #    queue.clear()
-
-            # Code to check patterns            
+        # Break if no frame captured
+        if not valid:
+            break
 
         if 'video_file' in kwargs:
             # forward by milliseconds
             milliseconds += MIN_COLOR_DURATION
             vid.set(cv2.CAP_PROP_POS_MSEC, milliseconds)
+        else:
+            # capture every min color duration 
+            curr_time = cv2.getTickCount()
+            elapsed_time = (curr_time - prev_time) / cv2.getTickFrequency()
+            if elapsed_time < MIN_COLOR_DURATION / 1000:
+                continue
+            prev_time = curr_time
+
+        # displaying the current frame
+        cv2.imshow("captured frame", frame)
+
+        # find dominant color from frame
+        r_estimate, g_estimate, b_estimate = find_dominant_color(frame)
+
+        # finding closest rgb from estimate
+        rgb = closest_rgb(r_estimate, g_estimate, b_estimate)
+        color = dec_to_color.get(rgb, '404')
+
+        # print((r_estimate,g_estimate,b_estimate), rgb, color)
+
+        color_seq.append(color)
+
+        if color != '404':
+            if right>2 and (full_buffer[right-1]==color  and full_buffer[right-2]==color):
+                continue
+            full_buffer.append(color)
+            right=right+1          
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
@@ -191,6 +154,7 @@ def capture_color_sequence(**kwargs):
     return color_seq
 
 print(capture_color_sequence(video_file='shortVideo.mp4'))
+
 # seq = capture_color_sequence()
 # print(len(seq))
 # print(seq)

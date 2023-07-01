@@ -77,7 +77,7 @@ valid_pattern = {
     ('maroon', 'red', 'red', 'purple'): 11,
     ('olive', 'lime', 'lime', 'teal'): 12,
     ('green', 'blue', 'blue', 'navy'): 13,
-    ('purple', 'gray', 'black', 'orange'): 14,
+    ('purple', 'grey', 'black', 'orange'): 14,
     ('teal', 'maroon', 'yellow', 'black'): 15,
     ('navy', 'olive', 'cyan', 'white'): 16,
     ('orange', 'green', 'magenta', 'red'): 17
