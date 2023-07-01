@@ -118,9 +118,9 @@ def capture_color_sequence(**kwargs):
             r = frame[:, :, 2:]
 
             # computing the mean
-            b_estimate = np.mean(b)
-            g_estimate = np.mean(g)
-            r_estimate = np.mean(r)
+            b_estimate = int(np.mean(b))
+            g_estimate = int(np.mean(g))
+            r_estimate = int(np.mean(r))
 
         # finding closest rgb from estimate
         rgb = closest_rgb(r_estimate, g_estimate, b_estimate)
