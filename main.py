@@ -21,7 +21,6 @@ def closest_valid_value(input_value):
     return -1
 
 def closest_rgb(r,g,b):
-
    r_valid = closest_valid_value(r)
    g_valid = closest_valid_value(g)
    b_valid = closest_valid_value(b)
@@ -67,7 +66,8 @@ def decode_sequence(seq):
 def capture_color_sequence(**kwargs):
     
     left,right=0,0
-    q=collections.deque()
+    partial_buffer=collections.deque()
+    full_buffer = collections.deque()
 
     color_seq = []
 
@@ -89,19 +89,29 @@ def capture_color_sequence(**kwargs):
             wait+=1
             continue
         wait+=1
+
+        # For final pattern after break
         if not valid:
-            if right-left==4 and right!=0:
-                tup=tuple(color_seq[left:right])
+            if right==4:
+                tup=tuple(full_buffer)
                 if tup in keys:
-                    if len(q)>1 and len(q)<=3:
-                        partialMatch(tuple(q))
-                    q.clear()
+                    if len(partial_buffer)>1 and len(partial_buffer)<=3:
+                        partialMatch(tuple(partial_buffer))
+                    partial_buffer.clear()
                     print("Valid Pattern ",valid_pattern[tup])
-                    left=right
+                    full_buffer.clear()
                 else:
-                    print("Invalid Pattern")
-                    q.append(color_seq[left])
-                    left=left+1
+                    if len(partial_buffer)>1 and len(partial_buffer)<=3:
+                        partialMatch(tuple(partial_buffer))
+                        temp=len(partial_buffer)
+                        partial_buffer.clear()
+                    else:
+                        print("Invalid Pattern")
+                        temp=1
+                    partial_buffer.append(full_buffer[0])
+                    while temp:
+                        full_buffer.popleft()
+                        temp-=1
             right=right+1
             break
 
@@ -128,24 +138,36 @@ def capture_color_sequence(**kwargs):
 
         # print((r_estimate,g_estimate,b_estimate), rgb, color)
 
-        # avoid invalid colors
-        if right-left==4 and right!=0:
-                tup=tuple(color_seq[left:right])
+        color_seq.append(color)
+
+        # Pattern matchining
+        if right==4:
+                tup=tuple(full_buffer)
                 if tup in keys:
-                    if len(q)>1 and len(q)<=3:
-                        partialMatch(tuple(q))
-                    q.clear()
+                    if len(partial_buffer)>1 and len(partial_buffer)<=3:
+                        partialMatch(tuple(partial_buffer))
+                    partial_buffer.clear()
                     print("Valid Pattern ",valid_pattern[tup])
-                    left=right
+                    full_buffer.clear()
+                    right=0
                 else:
-                    print("Invalid Pattern")
-                    q.append(color_seq[left])
-                    left=left+1
+                    if len(partial_buffer)>1 and len(partial_buffer)<=3:
+                        partialMatch(tuple(partial_buffer))
+                        temp=len(partial_buffer)
+                        partial_buffer.clear()
+                    else:
+                        print("Invalid Pattern")
+                        temp=1
+                    partial_buffer.append(full_buffer[0])
+                    while temp:
+                        full_buffer.popleft()
+                        right-=1
+                        temp-=1
 
         if color != '404':
-            if right>2 and (color_seq[right-1]==color  and color_seq[right-2]==color):
+            if right>2 and (full_buffer[right-1]==color  and full_buffer[right-2]==color):
                 continue
-            color_seq.append(color)
+            full_buffer.append(color)
             right=right+1
 
             # # decode sequence if queue has 4 color 
@@ -153,9 +175,7 @@ def capture_color_sequence(**kwargs):
             #    print(decode_sequence(queue))
             #    queue.clear()
 
-            # Code to check patterns
-            
-            
+            # Code to check patterns            
 
         if 'video_file' in kwargs:
             # forward by milliseconds
