@@ -174,7 +174,7 @@ def capture_color_sequence(**kwargs):
     cv2.destroyAllWindows()
     return color_seq
 
-# print('Color Sequence : ', capture_color_sequence(video_file='shortVideo.mp4'))
+# print('Color Sequence : ', capture_color_sequence(video_file='SeqOutput_TestVideo_3.avi'))
 
 seq = capture_color_sequence()
 print(len(seq))
