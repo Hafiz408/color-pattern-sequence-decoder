@@ -5,23 +5,28 @@ import time
 from env import *
 import collections
 
-# map color pixel values to valid pixel values
-def closest_value(input_value):
-  arr = np.array([0, 128, 192, 255])
-  i = (np.abs(arr - input_value)).argmin()
-  return arr[i]
-
 def skip_frames(fps,duration):
     return round(duration/(1000/fps))
 
 SKIP_FR = skip_frames(FPS,MIN_COLOR_DURATION)
 
-def closest_rgb(r,g,b):
-   r = closest_value(r)
-   g = closest_value(g)
-   b = closest_value(b)
+# map color pixel values to closest valid pixel values
+def closest_valid_value(input_value):
+  dec_codes = np.array(VALID_DEC_CODES)
+  min = (np.abs(dec_codes - input_value)).min()
+  if min <= THRESHOLD:
+    i = (np.abs(dec_codes - input_value)).argmin()
+    return dec_codes[i]
+  else:
+    return -1
 
-   return (r,g,b)
+def closest_rgb(r,g,b):
+
+   r_valid = closest_valid_value(r)
+   g_valid = closest_valid_value(g)
+   b_valid = closest_valid_value(b)
+
+   return (r_valid, g_valid, b_valid)
 
 # Function to find dominant color from frame from webcam
 def find_dominant_color(frame):
@@ -123,8 +128,6 @@ def capture_color_sequence(**kwargs):
 
         # print((r_estimate,g_estimate,b_estimate), rgb, color)
 
-        #color_seq.append(color)
-
         # avoid invalid colors
         if right-left==4 and right!=0:
                 tup=tuple(color_seq[left:right])
@@ -139,7 +142,6 @@ def capture_color_sequence(**kwargs):
                     q.append(color_seq[left])
                     left=left+1
 
-        #print(left,right,color)
         if color != '404':
             if right>2 and (color_seq[right-1]==color  and color_seq[right-2]==color):
                 continue
@@ -171,3 +173,4 @@ def capture_color_sequence(**kwargs):
 print(capture_color_sequence(video_file='shortVideo.mp4'))
 # seq = capture_color_sequence()
 # print(len(seq))
+# print(seq)
