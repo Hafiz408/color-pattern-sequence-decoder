@@ -2,7 +2,7 @@ import cv2
 import os
 from datetime import datetime
 
-path = "ML/Dataset/grey/"
+path = "ML/Dataset/magenta/"
 os.mkdir(path)
 
 i = 0
@@ -31,7 +31,7 @@ while True:
 
     if wait%1000==0:
 
-        filename = "Frame_" + str(i) + ".jpg"
+        filename = path + "Frame_" + str(i) + ".jpg"
         img=crop_frame_center(img)
         cv2.imwrite(filename, img)
         i += 1
